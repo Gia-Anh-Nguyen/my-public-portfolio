@@ -1,0 +1,77 @@
+#include <Servo.h>
+
+#define trigPin 10 //assign trigPin to pin D10
+#define echoPin 13 //assign echoPin to pin D13  
+#define servoPin1 A0 //assign servoPin1 to pin A0
+#define servoPin2 A1 //assign servoPin2 to pin A1
+Servo servo1; //declare servo name
+Servo servo2;
+int angle1=0; //declare integer value for angles
+int angle2=0;
+
+void setup() {
+  Serial.begin (9600); //begin 
+  pinMode(trigPin, OUTPUT);//assign OUTPUT to trigPin
+  pinMode(echoPin, INPUT); //assign INPUT to echoPin
+  servo1.attach(A0); //attach servo variable to a pin
+  servo2.attach(A1);
+  pinMode(A0,OUTPUT); //assign OUTPUT to A0
+  pinMode(A1,OUTPUT); //assign OUTPUT to A1
+  
+}
+
+void loop() {
+  float duration, distance; //declare float value for duration and distance
+  digitalWrite(trigPin, LOW); //trigPin has been configured as OUTPUT >> set value LOW for ground, HIGH for 5V(or 3.3V)
+  delayMicroseconds(2); //delay 2 miliseconds
+ 
+  digitalWrite(trigPin, HIGH); //set voltage to 5.5V for trigPin
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  duration = pulseIn(echoPin, HIGH); //read a pulse then start timing at HIGH
+  distance = (duration / 2) * 0.0344; //formula to calculate distance
+
+  //waving someone towards at a distance longer than 120cm
+  if (distance >= 120){
+    Serial.print("Distance = ");//print "Distance"
+    Serial.print(distance);//print value distance
+    Serial.print("cm");
+    Serial.println(" Get closer!");
+    for (angle1=0;angle1<=90;angle1+=1){ //for loop to start moving servo a 90 degree angle
+      servo1.write(angle1);
+      delay(15);
+    }
+    for (angle1=90;angle1>=0;angle1-=1){ //for loop to start moving servo back to original position
+       servo1.write(angle1);
+       delay(15);
+    }
+    delay(10);
+  }
+
+  //waving goodbye to someone after they get close enough
+  else if(distance <= 120 & distance >=20){
+    Serial.print("Distance= ");
+    Serial.print(distance);
+    Serial.println("cm");
+    for (angle2=0;angle2<=90;angle2+=1){
+      servo2.write(angle2);
+      delay(15);
+    }
+    for (angle2=90;angle2>=0;angle2-=1){
+      servo2.write(angle2);
+      delay(15);
+    }
+  delay(10);
+  }
+
+  //cease all action
+  else {
+    servo1.write(0);
+    servo2.write(0);
+    Serial.println("Too Close");
+  }
+  delay(500);
+  return 0;//end of code
+}
+
