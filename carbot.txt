@@ -1,0 +1,81 @@
+#include <Servo.h>
+
+#define trigPin1 10 // assign trigPin1 to pin D10
+#define echoPin1 11 // assign echoPin to pin D11
+// gn servoPin1 to pin A0
+
+Servo servo1; // declare servo name
+Servo servo2;
+
+ int angle1=0;
+ int angle2=0;
+
+void setup() {
+
+  Serial.begin(9600);
+  pinMode(trigPin1, OUTPUT); //assign OUTPUT to trigPin
+  pinMode(echoPin1, INPUT); // assign INPUT to echoPin  
+  pinMode(13,OUTPUT);
+  pinMode(12,OUTPUT);
+  servo1.attach(9);
+  servo2.attach(8);
+  }
+int distance ()
+{
+    float duration1, distance1; //declare float value for duration and distance 
+    digitalWrite(trigPin1,LOW);//trigPin has been configured as OUTPUT >> set value LOW for ground, HIGH
+    delayMicroseconds(2); // delay 2 miliseconds
+
+    digitalWrite(trigPin1,HIGH); // set voltage to 5.5V for trigPin
+    delayMicroseconds(10);
+    digitalWrite(trigPin1,LOW);
+    
+
+    duration1 = pulseIn(echoPin1,HIGH); // read a pulse then start timing at HIGH
+    distance1 = (duration1/2)*0.0344 ;//formula to calculate distance 
+   
+    Serial.print("Distance1= ");
+    Serial.print(distance1);
+    Serial.println("cm");
+    return distance1;
+  }
+
+void loop() {
+    float x,y,z,distancem; 
+    int flag; 
+    
+    x = distance();
+    y = distance();
+    z = distance();
+    distancem = (x+y+z)/3;
+
+
+  // motor 
+    
+      Serial.print("Distance1= ");
+      Serial.print(distancem);   
+      Serial.println("cm");
+       // Serial.println(" Get closer!");
+      servo2.attach(8);
+      digitalWrite(13,HIGH);
+      servo1.write(180);
+      digitalWrite(12,HIGH);
+      servo2.write(0);
+      delay(15);
+      while (distancem < 20){
+        digitalWrite(12,LOW);
+        servo2.write(180);
+        digitalWrite(13,LOW);
+        servo1.write(0);
+        delay(2000);
+        digitalWrite(12,HIGH);
+        servo2.write(180);
+        digitalWrite(13,HIGH);
+        servo1.write(0);
+        delay(1000); 
+        x = distance();
+        y = distance();
+        z = distance();
+        distancem = (x+y+z)/3;
+       }       
+}
